@@ -17,6 +17,7 @@ interface AdminPanelProps {
   searching: boolean;
   onSearch: () => void;
   onAddGame: (game: SteamGame, customPrice?: number) => void;
+  isAdmin: boolean;
 }
 
 export function AdminPanel({
@@ -29,11 +30,17 @@ export function AdminPanel({
   searching,
   onSearch,
   onAddGame,
+  isAdmin,
 }: AdminPanelProps) {
   const [editingAppId, setEditingAppId] = useState<number | null>(null);
 
   return (
-    <div className="mb-3 p-3 rounded-xl bg-blue-600/20 border border-blue-500/30 shrink-0">
+    <div className={`mb-3 p-3 rounded-xl shrink-0 ${isAdmin ? "bg-blue-600/20 border border-blue-500/30" : "bg-white/5 border border-white/10"}`}>
+      {!isAdmin && (
+        <p className="text-white/50 text-xs mb-2">
+          El juego quedara pendiente hasta que el admin lo apruebe.
+        </p>
+      )}
       <div className="flex flex-wrap gap-2 mb-3">
         {participants.map((p) => (
           <Button
@@ -81,7 +88,7 @@ export function AdminPanel({
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm truncate">{game.name}</p>
-                    {editingAppId === game.appid ? (
+                    {isAdmin && editingAppId === game.appid ? (
                       <PriceEditor
                         initialValue={game.priceNum}
                         onSave={(price) => {
@@ -92,12 +99,12 @@ export function AdminPanel({
                       />
                     ) : (
                       <p
-                        className="text-green-400 text-sm font-bold cursor-pointer hover:text-green-300"
-                        onClick={(e) => {
+                        className={`text-green-400 text-sm font-bold ${isAdmin ? "cursor-pointer hover:text-green-300" : ""}`}
+                        onClick={isAdmin ? (e) => {
                           e.stopPropagation();
                           setEditingAppId(game.appid);
-                        }}
-                        title="Click para editar precio"
+                        } : undefined}
+                        title={isAdmin ? "Click para editar precio" : undefined}
                       >
                         {game.price}
                         {game.currency !== "FREE" &&

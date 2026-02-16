@@ -4,7 +4,6 @@ import { Loader2 } from "lucide-react";
 import { useRanking } from "@/components/ranking/use-ranking";
 import { Header } from "@/components/ranking/Header";
 import { AdminPanel } from "@/components/ranking/AdminPanel";
-import { SuggestGamePanel } from "@/components/ranking/SuggestGamePanel";
 import { ParticipantCard } from "@/components/ranking/ParticipantCard";
 import { PurchaseDialog } from "@/components/ranking/PurchaseDialog";
 import { PendingDialog } from "@/components/ranking/PendingDialog";
@@ -43,35 +42,18 @@ export default function SteamRankingPage() {
             onLogout={() => r.setIsAdmin(false)}
           />
 
-          {r.isAdmin && (
-            <AdminPanel
-              participants={r.participants}
-              selectedParticipant={r.selectedParticipant}
-              onSelectParticipant={r.setSelectedParticipant}
-              searchQuery={r.searchQuery}
-              onSearchQueryChange={r.setSearchQuery}
-              searchResults={r.searchResults}
-              searching={r.searching}
-              onSearch={r.searchGames}
-              onAddGame={r.handleAddGame}
-            />
-          )}
-
-          {!r.isAdmin && (
-            <SuggestGamePanel
-              participants={r.participants}
-              open={r.suggestOpen}
-              onToggle={() => r.setSuggestOpen(!r.suggestOpen)}
-              selectedParticipant={r.suggestSelectedParticipant}
-              onSelectParticipant={r.setSuggestSelectedParticipant}
-              searchQuery={r.suggestSearchQuery}
-              onSearchQueryChange={r.setSuggestSearchQuery}
-              searchResults={r.suggestSearchResults}
-              searching={r.suggestSearching}
-              onSearch={r.suggestSearchGames}
-              onSuggest={r.handleSuggestGame}
-            />
-          )}
+          <AdminPanel
+            participants={r.participants}
+            selectedParticipant={r.selectedParticipant}
+            onSelectParticipant={r.setSelectedParticipant}
+            searchQuery={r.searchQuery}
+            onSearchQueryChange={r.setSearchQuery}
+            searchResults={r.searchResults}
+            searching={r.searching}
+            onSearch={r.searchGames}
+            onAddGame={r.handleAddGame}
+            isAdmin={r.isAdmin}
+          />
 
           <div className="flex flex-col gap-3">
             {r.participants.map((participant, index) => (

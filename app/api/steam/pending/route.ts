@@ -54,6 +54,35 @@ export async function POST(request: Request) {
   return NextResponse.json({ success: true });
 }
 
+// PUT - Agregar un juego a pendientes (desde usuarios no-admin)
+export async function PUT(request: Request) {
+  const body = await request.json();
+  const { participant_id, game_name, game_appid, game_image, price, currency } = body;
+
+  if (!participant_id || !game_name) {
+    return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
+  }
+
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/pending_purchases`, {
+    method: "POST",
+    headers: { ...supabaseHeaders(), Prefer: "return=minimal" },
+    body: JSON.stringify({
+      participant_id,
+      game_name,
+      game_appid: game_appid || null,
+      game_image: game_image || null,
+      price: price || 0,
+      currency: currency || "USD",
+    }),
+  });
+
+  if (!res.ok) {
+    return NextResponse.json({ error: "Error al agregar pendiente" }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
+}
+
 // DELETE - Rechazar/ignorar un pendiente
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
