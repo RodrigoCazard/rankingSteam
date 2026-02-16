@@ -42,18 +42,19 @@ export default function SteamRankingPage() {
             onLogout={() => r.setIsAdmin(false)}
           />
 
-          <AdminPanel
-            participants={r.participants}
-            selectedParticipant={r.selectedParticipant}
-            onSelectParticipant={r.setSelectedParticipant}
-            searchQuery={r.searchQuery}
-            onSearchQueryChange={r.setSearchQuery}
-            searchResults={r.searchResults}
-            searching={r.searching}
-            onSearch={r.searchGames}
-            onAddGame={r.handleAddGame}
-            isAdmin={r.isAdmin}
-          />
+          {r.isAdmin && (
+            <AdminPanel
+              participants={r.participants}
+              selectedParticipant={r.selectedParticipant}
+              onSelectParticipant={r.setSelectedParticipant}
+              searchQuery={r.searchQuery}
+              onSearchQueryChange={r.setSearchQuery}
+              searchResults={r.searchResults}
+              searching={r.searching}
+              onSearch={r.searchGames}
+              onAddGame={r.handleAddGame}
+            />
+          )}
 
           <div className="flex flex-col gap-3">
             {r.participants.map((participant, index) => (
