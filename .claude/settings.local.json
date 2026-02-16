@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:wiki.teamfortress.com)",
+      "WebFetch(domain:steamapi.xpaw.me)",
+      "WebFetch(domain:partner.steamgames.com)",
+      "Bash(npx next build)"
+    ]
+  }
+}
