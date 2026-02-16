@@ -19,6 +19,11 @@ export function useRanking() {
   const [pendingPurchases, setPendingPurchases] = useState<PendingPurchase[]>([]);
   const [syncing, setSyncing] = useState(false);
   const [pendingOpen, setPendingOpen] = useState(false);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [suggestSearchQuery, setSuggestSearchQuery] = useState("");
+  const [suggestSearchResults, setSuggestSearchResults] = useState<SteamGame[]>([]);
+  const [suggestSearching, setSuggestSearching] = useState(false);
+  const [suggestSelectedParticipant, setSuggestSelectedParticipant] = useState<number | null>(null);
 
   const fetchParticipants = useCallback(async () => {
     setLoading(true);
@@ -47,8 +52,8 @@ export function useRanking() {
   }, [fetchParticipants]);
 
   useEffect(() => {
-    if (isAdmin) fetchPending();
-  }, [isAdmin, fetchPending]);
+    fetchPending();
+  }, [fetchPending]);
 
   async function handleLogin() {
     try {
@@ -190,6 +195,42 @@ export function useRanking() {
     fetchParticipants();
   }
 
+  async function suggestSearchGames() {
+    if (!suggestSearchQuery.trim() || !suggestSelectedParticipant) return;
+    setSuggestSearching(true);
+    try {
+      const participant = participants.find((p) => p.id === suggestSelectedParticipant);
+      const cc = participant?.country_code || "US";
+      const response = await fetch(
+        `/api/steam/search?q=${encodeURIComponent(suggestSearchQuery)}&cc=${cc}`
+      );
+      const data = await response.json();
+      setSuggestSearchResults(data);
+    } catch {
+      setSuggestSearchResults([]);
+    }
+    setSuggestSearching(false);
+  }
+
+  async function handleSuggestGame(game: SteamGame) {
+    if (!suggestSelectedParticipant) return;
+    await fetch("/api/steam/suggest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        participant_id: suggestSelectedParticipant,
+        game_name: game.name,
+        game_appid: game.appid,
+        game_image: game.image,
+        price: game.priceNum,
+        currency: game.currency,
+      }),
+    });
+    await fetchPending();
+    setSuggestSearchQuery("");
+    setSuggestSearchResults([]);
+  }
+
   return {
     // State
     isAdmin,
@@ -215,6 +256,17 @@ export function useRanking() {
     setPassword,
     setLoginError,
     setLoginOpen,
+    // Suggest (public)
+    suggestOpen,
+    setSuggestOpen,
+    suggestSearchQuery,
+    setSuggestSearchQuery,
+    suggestSearchResults,
+    suggestSearching,
+    suggestSelectedParticipant,
+    setSuggestSelectedParticipant,
+    suggestSearchGames,
+    handleSuggestGame,
     // Actions
     handleLogin,
     searchGames,
