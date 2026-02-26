@@ -151,7 +151,7 @@ export function ParticipantCard({
             <p className={`font-bold text-green-400 ${priceSize}`}>
               ${participant.total.toFixed(2)}
             </p>
-            {/* {participant.purchases.length > 0 && (
+            {isAdmin && participant.purchases.length > 0 && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -163,7 +163,7 @@ export function ParticipantCard({
                 <Eye className="h-3 w-3" />
                 {participant.purchases.length} juegos
               </button>
-            )} */}
+            )}
           </div>
         </div>
         {sorted.length > 8 && (
