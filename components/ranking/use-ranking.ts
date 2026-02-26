@@ -161,6 +161,19 @@ export function useRanking() {
       // silently fail
     }
     setSyncing(false);
+
+    // Segundo paso en background: detectar juegos devueltos.
+    // No bloquea la UI ni el loading de juegos nuevos.
+    fetch("/api/steam/sync-returns", { method: "POST" })
+      .then((res) => res.json())
+      .then((data) => {
+        const totalRemoved = (data.removed?.length ?? 0) + (data.removed_pending?.length ?? 0);
+        if (totalRemoved > 0) {
+          fetchParticipants();
+          fetchPending();
+        }
+      })
+      .catch(() => {});
   }
 
   async function handleApprovePending(pending: PendingPurchase, customPrice?: number) {
