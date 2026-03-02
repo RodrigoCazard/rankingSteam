@@ -17,11 +17,12 @@ export function getRankTitle(index: number) {
   return RANK_TITLES[index] || "";
 }
 
-export function getTrophyIcon(position: number) {
-  if (position === 1) return <TrophyIcon className="h-4 w-4 text-yellow-400" />;
-  if (position === 2) return <TrophyIcon className="h-4 w-4 text-gray-300" />;
-  if (position === 3) return <TrophyIcon className="h-4 w-4 text-amber-600" />;
-  if (position === 5) return <span className="text-sm" title="Verguenza">🪳</span>;
+export function getTrophyIcon(position: number, size: "sm" | "lg" = "sm") {
+  const cls = size === "lg" ? "h-7 w-7" : "h-4 w-4";
+  if (position === 1) return <TrophyIcon className={`${cls} text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.7)]`} />;
+  if (position === 2) return <TrophyIcon className={`${cls} text-gray-300 drop-shadow-[0_0_4px_rgba(209,213,219,0.5)]`} />;
+  if (position === 3) return <TrophyIcon className={`${cls} text-amber-600 drop-shadow-[0_0_4px_rgba(217,119,6,0.5)]`} />;
+  if (position === 5) return <span className={size === "lg" ? "text-2xl" : "text-sm"} title="Verguenza">🪳</span>;
   return null;
 }
 

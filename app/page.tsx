@@ -7,6 +7,23 @@ import { AdminPanel } from "@/components/ranking/AdminPanel";
 import { ParticipantCard } from "@/components/ranking/ParticipantCard";
 import { PurchaseDialog } from "@/components/ranking/PurchaseDialog";
 import { PendingDialog } from "@/components/ranking/PendingDialog";
+import { getTrophyIcon, MONTH_NAMES } from "@/components/ranking/constants";
+
+function ZoneDivider({ label, color = "yellow" }: { label: string; color?: "yellow" | "red" | "gray" }) {
+  const styles = {
+    yellow: { via: "via-yellow-500/50", text: "text-yellow-400/80" },
+    red: { via: "via-red-500/50", text: "text-red-400/80" },
+    gray: { via: "via-white/20", text: "text-white/40" },
+  };
+  const { via, text } = styles[color];
+  return (
+    <div className="flex items-center gap-3 my-2">
+      <div className={`flex-1 h-px bg-gradient-to-r from-transparent ${via} to-transparent`} />
+      <span className={`${text} text-[10px] font-black tracking-[0.2em] uppercase px-2`}>{label}</span>
+      <div className={`flex-1 h-px bg-gradient-to-r from-transparent ${via} to-transparent`} />
+    </div>
+  );
+}
 
 export default function SteamRankingPage() {
   const r = useRanking();
@@ -19,60 +36,161 @@ export default function SteamRankingPage() {
     );
   }
 
-  return (
-    <main
-      className="min-h-svh bg-cover bg-center bg-fixed"
-      style={{ backgroundImage: "url('/bg-gaming.jpg')" }}
-    >
-      <div className="min-h-svh bg-black/70 backdrop-blur-sm p-4 md:p-6">
-        <div className="max-w-4xl mx-auto w-full">
-          <Header
+  const totalClan = r.participants.reduce((sum, p) => sum + p.total, 0);
+  const totalGames = r.participants.reduce((sum, p) => sum + p.purchases.length, 0);
+  const maxTotal = r.participants[0]?.total || 1;
+
+  const consejo = r.participants.slice(0, Math.min(3, r.participants.length));
+  const mediocres = r.participants.length > 2 ? r.participants.slice(3, r.participants.length - 1) : [];
+  const ultimo = r.participants.length > 1 ? r.participants[r.participants.length - 1] : null;
+
+  function renderCard(participant: typeof r.participants[0], index: number) {
+    return (
+      <div key={participant.id} className="flex gap-3 items-stretch">
+        <div className="flex-1 min-w-0">
+          <ParticipantCard
+            participant={participant}
+            index={index}
+            totalParticipants={r.participants.length}
             isAdmin={r.isAdmin}
-            syncing={r.syncing}
-            pendingCount={r.pendingPurchases.length}
-            loginOpen={r.loginOpen}
-            setLoginOpen={r.setLoginOpen}
-            password={r.password}
-            setPassword={r.setPassword}
-            loginError={r.loginError}
-            handleLogin={r.handleLogin}
-            onSync={r.handleSyncSteam}
-            onOpenPending={() => r.setPendingOpen(true)}
-            onCloseMonth={r.handleCloseMonth}
-            onLogout={() => r.setIsAdmin(false)}
+            maxTotal={maxTotal}
+            pendingForParticipant={r.pendingPurchases.filter(
+              (pp) => pp.participant_id === participant.id
+            )}
+            onViewParticipant={r.setViewingParticipant}
+            onApprovePending={r.handleApprovePending}
+            onRejectPending={r.handleRejectPending}
           />
-
-          {r.isAdmin && (
-            <AdminPanel
-              participants={r.participants}
-              selectedParticipant={r.selectedParticipant}
-              onSelectParticipant={r.setSelectedParticipant}
-              searchQuery={r.searchQuery}
-              onSearchQueryChange={r.setSearchQuery}
-              searchResults={r.searchResults}
-              searching={r.searching}
-              onSearch={r.searchGames}
-              onAddGame={r.handleAddGame}
-            />
+        </div>
+        <div className="w-[200px] shrink-0 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md flex flex-wrap content-start justify-start gap-1.5 p-2">
+          {participant.trophies?.length > 0 ? (
+            participant.trophies.map((trophy) => (
+              <span
+                key={trophy.id}
+                title={`${MONTH_NAMES[trophy.month - 1]} ${trophy.year}`}
+              >
+                {getTrophyIcon(trophy.position, "lg")}
+              </span>
+            ))
+          ) : (
+            <span className="text-white/15 text-xs">—</span>
           )}
+        </div>
+      </div>
+    );
+  }
 
-          <div className="flex flex-col gap-3">
-            {r.participants.map((participant, index) => (
-              <ParticipantCard
-                key={participant.id}
-                participant={participant}
-                index={index}
-                totalParticipants={r.participants.length}
-                isAdmin={r.isAdmin}
-                pendingForParticipant={r.pendingPurchases.filter(
-                  (pp) => pp.participant_id === participant.id
-                )}
-                onViewParticipant={r.setViewingParticipant}
-                onApprovePending={r.handleApprovePending}
-                onRejectPending={r.handleRejectPending}
-              />
+  return (
+    <main className="min-h-svh relative overflow-hidden">
+      {/* Fondo con blur */}
+      <div
+        className="absolute inset-0 bg-cover bg-center scale-110"
+        style={{ backgroundImage: "url('https://i.imgur.com/cYiVA8q.png')", filter: "blur(4px)" }}
+      />
+      <div className="absolute inset-0 bg-black/65" />
+      <div className="relative px-20 py-2 md:px-52 md:py-3">
+
+        <Header
+          isAdmin={r.isAdmin}
+          syncing={r.syncing}
+          pendingCount={r.pendingPurchases.length}
+          loginOpen={r.loginOpen}
+          setLoginOpen={r.setLoginOpen}
+          password={r.password}
+          setPassword={r.setPassword}
+          loginError={r.loginError}
+          handleLogin={r.handleLogin}
+          onSync={r.handleSyncSteam}
+          onOpenPending={() => r.setPendingOpen(true)}
+          onCloseMonth={r.handleCloseMonth}
+          onLogout={() => r.setIsAdmin(false)}
+        />
+
+        {r.isAdmin && (
+          <AdminPanel
+            participants={r.participants}
+            selectedParticipant={r.selectedParticipant}
+            onSelectParticipant={r.setSelectedParticipant}
+            searchQuery={r.searchQuery}
+            onSearchQueryChange={r.setSearchQuery}
+            searchResults={r.searchResults}
+            searching={r.searching}
+            onSearch={r.searchGames}
+            onAddGame={r.handleAddGame}
+          />
+        )}
+
+        {/* Layout 2 columnas */}
+        <div className="grid grid-cols-[200px_1fr] gap-5 items-start">
+
+          {/* Columna izquierda: Stats */}
+          <div className="flex flex-col gap-3 sticky top-4 mt-14">
+            {[
+              {
+                icon: "💰",
+                label: "Tesorería del Clan",
+                value: `$${totalClan.toFixed(2)}`,
+                from: "from-yellow-500/20",
+                border: "border-yellow-500/30",
+                textColor: "text-yellow-300",
+              },
+              {
+                icon: "🎮",
+                label: "Juegos Comprados",
+                value: String(totalGames),
+                from: "from-blue-500/20",
+                border: "border-blue-500/30",
+                textColor: "text-blue-300",
+              },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className={`rounded-xl border ${stat.border} bg-gradient-to-br ${stat.from} to-transparent backdrop-blur-md p-4 flex flex-col gap-2 flex-1`}
+              >
+                <span className="text-3xl">{stat.icon}</span>
+                <p className={`text-xl font-black ${stat.textColor} leading-tight`}>{stat.value}</p>
+                <p className="text-white/40 text-xs font-semibold uppercase tracking-wide leading-tight">{stat.label}</p>
+              </div>
             ))}
           </div>
+
+          {/* Columna central: Ranking */}
+          <div>
+            {consejo.length > 0 && (
+              <>
+                <div className="pr-[220px]">
+                  <ZoneDivider label="⚔️  El Consejo  ⚔️" color="yellow" />
+                </div>
+                <div className="flex flex-col gap-3">
+                  {consejo.map((p, i) => renderCard(p, i))}
+                </div>
+              </>
+            )}
+
+            {mediocres.length > 0 && (
+              <>
+                <div className="pr-[220px] my-4">
+                  <div className="h-px bg-white/10" />
+                </div>
+                <div className="flex flex-col gap-3">
+                  {mediocres.map((p, i) => renderCard(p, i + 3))}
+                </div>
+              </>
+            )}
+
+            {ultimo && (
+              <>
+                <div className="pr-[220px]">
+                  <ZoneDivider label="💀  El Sótano de la Vergüenza  💀" color="red" />
+                </div>
+                <div className="flex flex-col gap-3">
+                  {renderCard(ultimo, r.participants.length - 1)}
+                </div>
+              </>
+            )}
+          </div>
+
+
         </div>
       </div>
 

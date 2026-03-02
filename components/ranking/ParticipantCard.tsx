@@ -11,6 +11,7 @@ interface ParticipantCardProps {
   index: number;
   totalParticipants: number;
   isAdmin: boolean;
+  maxTotal: number;
   pendingForParticipant: PendingPurchase[];
   onViewParticipant: (p: Participant) => void;
   onApprovePending: (pending: PendingPurchase, customPrice?: number) => void;
@@ -35,9 +36,15 @@ const BADGE_STYLES: Record<number, string> = {
 };
 
 const AVATAR_SIZES: Record<number, string> = {
-  0: "w-12 h-12 sm:w-14 sm:h-14",
-  1: "w-11 h-11 sm:w-12 sm:h-12",
-  2: "w-10 h-10 sm:w-11 sm:h-11",
+  0: "w-14 h-14",
+  1: "w-12 h-12",
+  2: "w-11 h-11",
+};
+
+const XP_BAR_COLORS: Record<number, string> = {
+  0: "from-yellow-400 to-amber-500",
+  1: "from-slate-300 to-gray-400",
+  2: "from-amber-600 to-orange-600",
 };
 
 export function ParticipantCard({
@@ -45,6 +52,7 @@ export function ParticipantCard({
   index,
   totalParticipants,
   isAdmin,
+  maxTotal,
   pendingForParticipant,
   onViewParticipant,
   onApprovePending,
@@ -59,11 +67,11 @@ export function ParticipantCard({
 
   const badgeClass = BADGE_STYLES[index] || "bg-purple-500/30 text-purple-300";
   const avatarSize = AVATAR_SIZES[index] || "w-10 h-10";
-  const nameSize = index === 0 ? "text-base sm:text-lg" : index === 1 ? "text-sm sm:text-base" : "text-sm";
-  const priceSize = index === 0 ? "text-xl sm:text-2xl" : index === 1 ? "text-lg sm:text-xl" : index === 2 ? "text-base sm:text-lg" : "text-base";
+  const nameSize = index === 0 ? "text-lg" : index === 1 ? "text-base" : "text-sm";
+  const priceSize = index === 0 ? "text-2xl" : index === 1 ? "text-xl" : index === 2 ? "text-lg" : "text-base";
 
   const cardStyle = isLastPlace
-    ? { animation: "wobble 1.5s ease-in-out infinite" }
+    ? { animation: "shake 1.2s ease-in-out infinite" }
     : index === 0
     ? { animation: "glow 2s ease-in-out infinite alternate" }
     : undefined;
@@ -73,7 +81,7 @@ export function ParticipantCard({
   return (
     <div
      
-      className={`rounded-xl p-3 sm:p-4 backdrop-blur-md transition-all relative overflow-hidden  ${cardClass}`}
+      className={`rounded-xl p-4 backdrop-blur-md transition-all relative overflow-hidden ${cardClass}`}
       style={cardStyle}
     >
       {/* Decoraciones por posición */}
@@ -131,26 +139,24 @@ export function ParticipantCard({
             >
               {getRankTitle(index)}
             </span>
-            {participant.trophies?.length > 0 && (
-              <div
-                className="flex items-center gap-1"
-                title={`${participant.trophies.length} trofeos ganados`}
-              >
-                {participant.trophies.map((trophy) => (
-                  <span
-                    key={trophy.id}
-                    title={`${MONTH_NAMES[trophy.month - 1]} ${trophy.year}`}
-                  >
-                    {getTrophyIcon(trophy.position)}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
           <div className="flex items-center gap-2">
             <p className={`font-bold text-green-400 ${priceSize}`}>
               ${participant.total.toFixed(2)}
             </p>
+            {/* Barra XP */}
+            {maxTotal > 0 && (
+              <div className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden min-w-[40px]">
+                <div
+                  className={`h-full rounded-full bg-gradient-to-r transition-all duration-700 ${
+                    isLastPlace
+                      ? "from-red-500 to-red-700"
+                      : XP_BAR_COLORS[index] || "from-blue-400 to-blue-600"
+                  }`}
+                  style={{ width: `${Math.min((participant.total / maxTotal) * 100, 100)}%` }}
+                />
+              </div>
+            )}
             {isAdmin && participant.purchases.length > 0 && (
               <button
                 type="button"
@@ -181,7 +187,7 @@ export function ParticipantCard({
       {/* Thumbnails de juegos comprados */}
       {sorted.length > 0 && (
         <div
-          className="mt-2 grid gap-2 grid-cols-1 grid-cols-4 sm:grid-cols-6 md:grid-cols-8  xl:grid-cols-8"
+          className="mt-1 grid gap-1 grid-cols-4 sm:grid-cols-6 md:grid-cols-8 xl:grid-cols-8"
 
 
           onClick={(e) => e.stopPropagation()}
@@ -191,7 +197,7 @@ export function ParticipantCard({
               key={purchase.id}
               src={purchase.game_image || "/placeholder.svg"}
               alt={purchase.game_name}
-              className="h-13  transition-transform duration-200 hover:scale-105  object-cover rounded-md border border-white/10 shrink-0 cursor-pointer hover:border-white/30 transition-colors"
+              className="h-14 transition-transform duration-200 hover:scale-105 object-cover rounded-md border border-white/10 shrink-0 cursor-pointer hover:border-white/30"
               title={`${purchase.game_name} - $${Number(purchase.price).toFixed(2)}`}
              onClick={() =>
     window.open(
