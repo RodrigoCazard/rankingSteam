@@ -41,22 +41,23 @@ export function Header({
   const now = new Date();
 
   return (
-    <div className="mb-6 shrink-0 relative">
-      {/* Título medieval — verdaderamente centrado */}
-      <div className="text-center py-1">
-        <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-          Familia Mentirosos y Ratas Unidos
-        </h1>
-        <div className="flex items-center justify-center gap-1.5 text-white/40 text-sm mt-1 font-medium">
-          <CalendarDays className="h-3 w-3 shrink-0" />
-          <span className="italic">
-            Temporada de {MONTH_NAMES[now.getMonth()]} {now.getFullYear()}
-          </span>
+    <div className="mb-6 shrink-0">
+      <div className="flex items-start gap-2">
+        {/* Título — ocupa todo el espacio restante y centra dentro de él */}
+        <div className="flex-1 text-center py-1 min-w-0">
+          <h1 className="text-lg sm:text-4xl font-black text-white tracking-tight leading-tight">
+            Familia Mentirosos y Ratas Unidos
+          </h1>
+          <div className="flex items-center justify-center gap-1.5 text-white/40 text-xs sm:text-sm mt-1 font-medium">
+            <CalendarDays className="h-3 w-3 shrink-0" />
+            <span className="italic">
+              Temporada de {MONTH_NAMES[now.getMonth()]} {now.getFullYear()}
+            </span>
+          </div>
         </div>
-      </div>
 
-      {/* Botones admin en posición absoluta para no afectar centrado */}
-      <div className="absolute top-2 right-0">
+        {/* Botones admin — fijos a la derecha sin solapar el título */}
+        <div className="shrink-0 pt-1">
         {!isAdmin ? (
           <LoginDialog
             open={loginOpen}
@@ -67,7 +68,7 @@ export function Header({
             error={loginError}
           />
         ) : (
-          <div className="flex gap-1 sm:gap-2 shrink-0">
+          <div className="flex gap-1 shrink-0">
             <Button
               variant="ghost"
               size="sm"
@@ -115,6 +116,7 @@ export function Header({
             </Button>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

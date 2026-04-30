@@ -132,10 +132,10 @@ export function ParticipantCard({
 
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <h3 className={`font-bold text-white ${nameSize}`}>{participant.name}</h3>
             <span
-              className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-semibold ${badgeClass}`}
+              className={`text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-full font-semibold shrink-0 ${badgeClass}`}
             >
               {getRankTitle(index)}
             </span>
@@ -176,9 +176,9 @@ export function ParticipantCard({
             <button
               type="button"
               onClick={() => onViewParticipant(participant)}
-              className="relative z-10 cursor-pointer h-12  px-3 shrink-0  rounded-md border border-white/10 bg-white/5 hover:bg-white/15 text-white/60 hover:text-white text-xs font-medium transition-colors flex items-center "
+              className="relative z-10 cursor-pointer h-8 sm:h-12 px-2 sm:px-3 shrink-0 rounded-md border border-white/10 bg-white/5 hover:bg-white/15 text-white/60 hover:text-white text-[10px] sm:text-xs font-medium transition-colors flex items-center"
             >
-              +{sorted.length - 8} juegos mas
+              +{sorted.length - 8}
             </button>
           )}
       </div>
@@ -187,7 +187,7 @@ export function ParticipantCard({
       {/* Thumbnails de juegos comprados */}
       {sorted.length > 0 && (
         <div
-          className="mt-1 grid gap-1 grid-cols-4 sm:grid-cols-6 md:grid-cols-8 xl:grid-cols-8"
+          className="mt-1 grid gap-1 grid-cols-4 sm:grid-cols-6 md:grid-cols-8"
 
 
           onClick={(e) => e.stopPropagation()}
