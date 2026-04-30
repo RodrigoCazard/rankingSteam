@@ -62,7 +62,7 @@ export default function SteamRankingPage() {
             onRejectPending={r.handleRejectPending}
           />
         </div>
-        <div className="w-[200px] shrink-0 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md flex flex-wrap content-start justify-start gap-1.5 p-2">
+        <div className="hidden lg:flex w-[200px] shrink-0 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md flex-wrap content-start justify-start gap-1.5 p-2">
           {participant.trophies?.length > 0 ? (
             participant.trophies.map((trophy) => (
               <span
@@ -88,7 +88,7 @@ export default function SteamRankingPage() {
         style={{ backgroundImage: "url('https://i.imgur.com/cYiVA8q.png')", filter: "blur(4px)" }}
       />
       <div className="absolute inset-0 bg-black/65" />
-      <div className="relative px-20 py-2 md:px-52 md:py-3">
+      <div className="relative px-3 py-2 sm:px-6 md:px-20 lg:px-52 lg:py-3">
 
         <Header
           isAdmin={r.isAdmin}
@@ -121,10 +121,10 @@ export default function SteamRankingPage() {
         )}
 
         {/* Layout 2 columnas */}
-        <div className="grid grid-cols-[200px_1fr] gap-5 items-start">
+        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[200px_1fr] lg:gap-5 lg:items-start">
 
           {/* Columna izquierda: Stats */}
-          <div className="flex flex-col gap-3 sticky top-4 mt-14">
+          <div className="flex flex-row gap-3 lg:flex-col lg:sticky lg:top-4 lg:mt-14">
             {[
               {
                 icon: "💰",
@@ -145,10 +145,10 @@ export default function SteamRankingPage() {
             ].map((stat) => (
               <div
                 key={stat.label}
-                className={`rounded-xl border ${stat.border} bg-gradient-to-br ${stat.from} to-transparent backdrop-blur-md p-4 flex flex-col gap-2 flex-1`}
+                className={`rounded-xl border ${stat.border} bg-gradient-to-br ${stat.from} to-transparent backdrop-blur-md p-3 lg:p-4 flex flex-col gap-1 lg:gap-2 flex-1`}
               >
-                <span className="text-3xl">{stat.icon}</span>
-                <p className={`text-xl font-black ${stat.textColor} leading-tight`}>{stat.value}</p>
+                <span className="text-2xl lg:text-3xl">{stat.icon}</span>
+                <p className={`text-base lg:text-xl font-black ${stat.textColor} leading-tight`}>{stat.value}</p>
                 <p className="text-white/40 text-xs font-semibold uppercase tracking-wide leading-tight">{stat.label}</p>
               </div>
             ))}
@@ -158,7 +158,7 @@ export default function SteamRankingPage() {
           <div>
             {consejo.length > 0 && (
               <>
-                <div className="pr-[220px]">
+                <div className="lg:pr-[220px]">
                   <ZoneDivider label="⚔️  El Consejo  ⚔️" color="yellow" />
                 </div>
                 <div className="flex flex-col gap-3">
@@ -169,7 +169,7 @@ export default function SteamRankingPage() {
 
             {mediocres.length > 0 && (
               <>
-                <div className="pr-[220px] my-4">
+                <div className="lg:pr-[220px] my-4">
                   <div className="h-px bg-white/10" />
                 </div>
                 <div className="flex flex-col gap-3">
@@ -180,7 +180,7 @@ export default function SteamRankingPage() {
 
             {ultimo && (
               <>
-                <div className="pr-[220px]">
+                <div className="lg:pr-[220px]">
                   <ZoneDivider label="💀  El Sótano de la Vergüenza  💀" color="red" />
                 </div>
                 <div className="flex flex-col gap-3">

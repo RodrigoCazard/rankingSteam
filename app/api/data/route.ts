@@ -15,6 +15,7 @@ const FALLBACK_PARTICIPANTS = [
   { id: 3, name: "Dyx", avatar_url: "/avatars/dyx.png" },
   { id: 4, name: "Mostacho", avatar_url: "/avatars/mostacho.png" },
   { id: 5, name: "Rueda Desinflada", avatar_url: "/avatars/rueda.png" },
+  { id: 6, name: "Cazard", avatar_url: "https://avatars.fastly.steamstatic.com/4028d8c1ad00ee8a4b4c8ed9bd7cbe1a0d4238fd_full.jpg" },
 ];
 
 type Trophy = { id: number; participant_id: number; month: number; year: number; position: number; total_spent: number };
@@ -107,6 +108,33 @@ export async function POST(request: Request) {
       });
       const text = await res.text();
       if (!text.includes("Invalid request") && res.ok) {
+        // Marcar el appid como conocido para que sync-returns no lo elimine pensando que fue devuelto
+        if (game_appid) {
+          try {
+            const partRes = await fetch(
+              `${SUPABASE_URL}/rest/v1/participants?id=eq.${participant_id}&select=known_appids`,
+              { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, cache: "no-store" }
+            );
+            if (partRes.ok) {
+              const [part] = await partRes.json();
+              const known: number[] = part?.known_appids || [];
+              if (!known.includes(game_appid)) {
+                await fetch(`${SUPABASE_URL}/rest/v1/participants?id=eq.${participant_id}`, {
+                  method: "PATCH",
+                  headers: {
+                    apikey: SUPABASE_KEY,
+                    Authorization: `Bearer ${SUPABASE_KEY}`,
+                    "Content-Type": "application/json",
+                    Prefer: "return=minimal",
+                  },
+                  body: JSON.stringify({ known_appids: [...known, game_appid] }),
+                });
+              }
+            }
+          } catch {
+            // No crítico, no falla la request
+          }
+        }
         return NextResponse.json({ success: true });
       }
     } catch {
