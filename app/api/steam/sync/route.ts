@@ -52,7 +52,11 @@ async function getGamePrice(appid: number, countryCode: string): Promise<{ price
       return { price: 0, currency: "FREE", image: gameData.header_image || "" };
     }
     const priceInfo = gameData.price_overview;
-    if (!priceInfo) return null;
+    // Sin price_overview = juego activado por clave o no disponible en tienda.
+    // Se agrega con precio 0 para que el admin lo complete manualmente.
+    if (!priceInfo) {
+      return { price: 0, currency: "KEY", image: gameData.header_image || "" };
+    }
 
     return {
       price: priceInfo.final / 100,
@@ -153,8 +157,18 @@ export async function syncSteamLibraries() {
     for (const game of newGames) {
       const priceData = await getGamePrice(game.appid, countryCode);
 
-      if (!priceData || priceData.currency === "FREE" || priceData.price === 0) {
+      if (!priceData || priceData.currency === "FREE") {
         skippedFree++;
+      } else if (priceData.currency === "KEY") {
+        // Activado por clave: precio desconocido, queda en 0 para que el admin lo complete
+        pendingGames.push({
+          participant_id: p.id,
+          appid: game.appid,
+          name: game.name,
+          image: priceData.image,
+          price: 0,
+          currency: "KEY",
+        });
       } else {
         const priceUSD = await convertToUSD(priceData.price, priceData.currency);
         pendingGames.push({

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useRanking } from "@/components/ranking/use-ranking";
 import { Header } from "@/components/ranking/Header";
@@ -7,6 +8,7 @@ import { AdminPanel } from "@/components/ranking/AdminPanel";
 import { ParticipantCard } from "@/components/ranking/ParticipantCard";
 import { PurchaseDialog } from "@/components/ranking/PurchaseDialog";
 import { PendingDialog } from "@/components/ranking/PendingDialog";
+import { HistoryDialog } from "@/components/ranking/HistoryDialog";
 import { getTrophyIcon, MONTH_NAMES } from "@/components/ranking/constants";
 
 function ZoneDivider({ label, color = "yellow" }: { label: string; color?: "yellow" | "red" | "gray" }) {
@@ -27,6 +29,7 @@ function ZoneDivider({ label, color = "yellow" }: { label: string; color?: "yell
 
 export default function SteamRankingPage() {
   const r = useRanking();
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   if (r.loading) {
     return (
@@ -104,6 +107,7 @@ export default function SteamRankingPage() {
           onOpenPending={() => r.setPendingOpen(true)}
           onCloseMonth={r.handleCloseMonth}
           onLogout={() => r.setIsAdmin(false)}
+          onOpenHistory={() => setHistoryOpen(true)}
         />
 
         {r.isAdmin && (
@@ -210,6 +214,12 @@ export default function SteamRankingPage() {
         participants={r.participants}
         onApprove={r.handleApprovePending}
         onReject={r.handleRejectPending}
+      />
+
+      <HistoryDialog
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
+        participants={r.participants}
       />
     </main>
   );

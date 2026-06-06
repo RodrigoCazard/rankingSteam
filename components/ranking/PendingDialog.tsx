@@ -62,7 +62,17 @@ export function PendingDialog({
                     className="w-24 sm:w-36 h-[45px] sm:h-[68px] object-cover rounded-md shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm truncate">{pending.game_name}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-white text-sm truncate">{pending.game_name}</p>
+                      {pending.currency === "KEY" && (
+                        <span
+                          className="shrink-0 text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded px-1 py-0"
+                          title="Activado por clave — el precio es desconocido, edítalo antes de aprobar"
+                        >
+                          🔑 clave
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2">
                       {isEditing ? (
                         <PriceEditor
@@ -76,13 +86,15 @@ export function PendingDialog({
                       ) : (
                         <>
                           <p
-                            className="text-green-400 text-xs font-bold cursor-pointer hover:text-green-300"
+                            className={`text-xs font-bold cursor-pointer hover:opacity-80 ${pending.currency === "KEY" ? "text-amber-400" : "text-green-400 hover:text-green-300"}`}
                             onClick={() => setEditingId(pending.id)}
                             title="Click para editar precio"
                           >
                             {pending.currency === "FREE"
                               ? "Gratis"
-                              : `$${Number(pending.price).toFixed(2)} ${pending.currency}`}
+                              : pending.currency === "KEY"
+                              ? "Precio pendiente — click para editar"
+                              : `$${Number(pending.price).toFixed(2)} USD`}
                           </p>
                           <span className="text-white/30 text-xs">|</span>
                           <p className="text-blue-300 text-xs">{participantName}</p>

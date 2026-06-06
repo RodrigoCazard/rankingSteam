@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { sendPurchaseNotification } from "@/lib/discord";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -51,18 +50,6 @@ export async function POST(request: Request) {
     method: "DELETE",
     headers: supabaseHeaders(),
   });
-
-  // Notificar a Discord (sin bloquear)
-  const partRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/participants?id=eq.${participant_id}&select=name`,
-    { headers: supabaseHeaders(), cache: "no-store" }
-  ).catch(() => null);
-  if (partRes?.ok) {
-    const [participant] = await partRes.json();
-    if (participant?.name) {
-      sendPurchaseNotification(participant.name, game_name, Number(price) || 0, game_image);
-    }
-  }
 
   return NextResponse.json({ success: true });
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CalendarDays, RefreshCw, Bell, LogOut, Loader2 } from "lucide-react";
+import { CalendarDays, RefreshCw, Bell, LogOut, Loader2, History } from "lucide-react";
 import { MONTH_NAMES } from "./constants";
 import { LoginDialog } from "./LoginDialog";
 
@@ -21,6 +21,8 @@ interface HeaderProps {
   onOpenPending: () => void;
   onCloseMonth: () => void;
   onLogout: () => void;
+  // History (all users)
+  onOpenHistory: () => void;
 }
 
 export function Header({
@@ -37,6 +39,7 @@ export function Header({
   onOpenPending,
   onCloseMonth,
   onLogout,
+  onOpenHistory,
 }: HeaderProps) {
   const now = new Date();
 
@@ -57,7 +60,16 @@ export function Header({
         </div>
 
         {/* Botones admin — fijos a la derecha sin solapar el título */}
-        <div className="shrink-0 pt-1">
+        <div className="shrink-0 pt-1 flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onOpenHistory}
+            className="text-white/50 hover:text-white hover:bg-white/10"
+            title="Historial de temporadas"
+          >
+            <History className="h-4 w-4" />
+          </Button>
         {!isAdmin ? (
           <LoginDialog
             open={loginOpen}
